@@ -2,6 +2,7 @@ services:
     grafana:
         container_name: grafana
         image: grafana/grafana:11.5.1
+#        extra_hosts: ['host.docker.internal:host-gateway']
         restart: on-failure
         command:
             - --config=/etc/grafana-config/grafana.ini
@@ -22,8 +23,8 @@ services:
 #            # Use this optional env file to add any secrets required by data sources you can add to config/grafana/datasources
 #            - path: ~/.grafana_dev_datasources
 #              required: false
+
     mimir:
-        container_name: mimir
         image: grafana/mimir:2.14.3
         restart: on-failure
         command:
@@ -34,14 +35,12 @@ services:
             - "9009:9009"
 
     loki:
-        container_name: loki
         image: grafana/loki:3.4.1
         restart: on-failure
         ports:
             - "3100:3100"
 
     tempo:
-        container_name: tempo
         image: grafana/tempo:2.7.0
         restart: on-failure
         command:
@@ -54,8 +53,12 @@ services:
             - "3200:3200"
             - "4317:4317"
 
+    pyroscope:
+        image: grafana/pyroscope:1.5.0
+        restart: on-failure
+        ports:
+            - "4040:4040"
     alloy:
-        container_name: alloy
         image: grafana/alloy:v1.5.1
         pull_policy: always
 #        profiles: ["alloy"]
@@ -66,27 +69,32 @@ services:
             REMOTE_WRITE_HOST: mimir:9009
             LOKI_HOST: loki:3100
             TEMPO_HOST: tempo:4317
-#            PYROSCOPE_HOST: pyroscope:4040
+            PYROSCOPE_HOST: pyroscope:4040
         depends_on:
             - mimir
             - loki
             - tempo
-#            - pyroscope
+            - pyroscope
         command:
             - run
             - /etc/alloy/config.alloy
             - --storage.path=/var/lib/alloy/data
-            - --server.http.listen-addr=0.0.0.0:4318
+            - --server.http.listen-addr=0.0.0.0:12345
             - --stability.level=experimental # Enable all functionality
         ports:
-            - "4318:4318"
+            - "12345:12345"
 networks:
     default:
         name: ksoot
         driver: bridge
 
-volumes:
-    prometheus:
-        driver: local
-    tempo:
-        driver: local
+#volumes:
+#    alloy_data:
+#    grafana:
+#        driver: local
+#    tempo:
+#        driver: local
+#    alloy:
+#        driver: local
+#    mimir:
+#        driver: local

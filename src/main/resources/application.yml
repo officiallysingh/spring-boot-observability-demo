@@ -99,12 +99,17 @@ management:
       probability: 1.0
   otlp:
     logging:
-      endpoint: "http://localhost:4318"
+#      endpoint: "http://localhost:4318"
+      endpoint: https://localhost:12345/v1/logs
     metrics:
       export:
-        url: "http://localhost:4318"
+        url: http://localhost:12345/v1/metrics
     tracing:
-      endpoint: "http://localhost:4318"
+      endpoint: "http://localhost:12345"
+otel:
+  exporter:
+    otlp:
+      endpoint: "http://localhost:12345"
 
 server:
   port: 8090

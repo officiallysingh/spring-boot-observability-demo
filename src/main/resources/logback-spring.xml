@@ -13,11 +13,11 @@
             <attribute key="service.name" value="spring-boot-observability-demo"/>
             <attribute key="service.instance.id" value="${HOSTNAME}"/>
         </resourceAttributes>
-        <exporter>
-            <otlp>
-                <endpoint>http://localhost:4318</endpoint>
-            </otlp>
-        </exporter>
+<!--        <exporter>-->
+<!--            <otlp>-->
+<!--                <endpoint>http://localhost:4318</endpoint>-->
+<!--            </otlp>-->
+<!--        </exporter>-->
     </appender>
 
     <root level="INFO">
