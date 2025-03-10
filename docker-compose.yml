@@ -2,7 +2,7 @@ services:
     grafana:
         container_name: grafana
         image: grafana/grafana:11.5.1
-#        extra_hosts: ['host.docker.internal:host-gateway']
+        extra_hosts: ['host.docker.internal:host-gateway']
         restart: on-failure
         command:
             - --config=/etc/grafana-config/grafana.ini
@@ -25,7 +25,9 @@ services:
 #              required: false
 
     mimir:
+        container_name: mimir
         image: grafana/mimir:2.14.3
+        extra_hosts: ['host.docker.internal:host-gateway']
         restart: on-failure
         command:
             - -config.file=/etc/mimir-config/mimir.yaml
@@ -35,14 +37,20 @@ services:
             - "9009:9009"
 
     loki:
+        container_name: loki
         image: grafana/loki:3.4.1
+        extra_hosts: ['host.docker.internal:host-gateway']
         restart: on-failure
         ports:
             - "3100:3100"
 
     tempo:
+        container_name: tempo
         image: grafana/tempo:2.7.0
+        extra_hosts: ['host.docker.internal:host-gateway']
         restart: on-failure
+#        volumes:
+#            - ./observability/config/tempo.yml:/etc/tempo.yml:ro
         command:
             - "-storage.trace.backend=local"                  # tell tempo where to permanently put traces
             - "-storage.trace.local.path=/tmp/tempo/traces"
@@ -51,15 +59,26 @@ services:
             - "-server.http-listen-port=3200"
         ports:
             - "3200:3200"
-            - "4317:4317"
+#            - "4317:4317"
 
     pyroscope:
+        container_name: pyroscope
         image: grafana/pyroscope:1.5.0
+        extra_hosts: ['host.docker.internal:host-gateway']
         restart: on-failure
         ports:
             - "4040:4040"
+#    beyla:
+#        image: grafana/beyla:latest
+#        pid: "service:goblog"
+#        privileged: true
+#        environment:
+#            BEYLA_TRACE_PRINTER: text
+#            BEYLA_OPEN_PORT: 8443
     alloy:
+        container_name: alloy
         image: grafana/alloy:v1.5.1
+        extra_hosts: ['host.docker.internal:host-gateway']
         pull_policy: always
 #        profiles: ["alloy"]
         restart: on-failure
@@ -71,6 +90,7 @@ services:
             TEMPO_HOST: tempo:4317
             PYROSCOPE_HOST: pyroscope:4040
         depends_on:
+#            - beyla
             - mimir
             - loki
             - tempo
@@ -83,6 +103,8 @@ services:
             - --stability.level=experimental # Enable all functionality
         ports:
             - "12345:12345"
+            - 4318:4318
+            - 4317:4317
 networks:
     default:
         name: ksoot

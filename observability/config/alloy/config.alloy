@@ -1,88 +1,58 @@
-// This file serves as an example Alloy configuration to interact with the
-// Docker Compose environment.
-//
-// This configuration works whether you are running Alloy locally or within the
-// Docker Compose environment when the `alloy` profile is enabled.
-
 logging {
-	level = "debug"
-
-	// Forward internal logs to the local Loki instance.
-	write_to = [loki.relabel.alloy_logs.receiver]
+  level  = "debug"
+  format = "logfmt"
 }
 
-loki.relabel "alloy_logs"{
-	rule {
-		target_label = "instance"
-		replacement = constants.hostname
-	}
+otelcol.receiver.otlp "default" {
+  grpc {
+    endpoint = "0.0.0.0:4317"
+  }
+  http {
+    endpoint = "0.0.0.0:4318"
+  }
 
-	rule {
-		target_label = "job"
-		replacement = "integrations/self"
-	}
-
-	forward_to = [loki.write.loki.receiver]
+  output {
+    metrics = [otelcol.processor.batch.default.input]
+    logs    = [otelcol.processor.batch.default.input]
+    traces  = [otelcol.processor.batch.default.input]
+  }
 }
 
-tracing {
-	// Write all spans. Don't do this in production!
-	sampling_fraction = 1.0
-
-	// Forward internal spans to the local Tempo instance.
-	write_to = [otelcol.exporter.otlp.tempo.input]
+otelcol.processor.batch "default" {
+  output {
+    metrics  = [otelcol.exporter.otlphttp.tempo.input]
+    traces   = [otelcol.exporter.otlphttp.tempo.input]
+    logs     = [otelcol.exporter.otlphttp.tempo.input]
+  }
 }
 
-// Collect metrics from the local running Alloy instance and forward to
-// Prometheus.
-prometheus.exporter.self "alloy" {}
-prometheus.scrape "alloy" {
-	targets    = prometheus.exporter.self.alloy.targets
-	forward_to = [prometheus.remote_write.mimir.receiver]
+otelcol.exporter.otlphttp "tempo" {
+    client {
+        endpoint = "http://tempo:3200"
+        tls {
+            insecure             = true
+            insecure_skip_verify = true
+        }
+    }
 }
 
-// Collect profiles from the local running Alloy instance and forward to
-// Pyroscope.
-pyroscope.scrape "default" {
-  targets = [
-    {"__address__" = "localhost:12345", "service_name" = "alloy"},
-  ]
-  forward_to = [pyroscope.write.pyroscope.receiver]
+otelcol.exporter.prometheus "default" {
+  forward_to = [prometheus.remote_write.default.receiver]
 }
 
-prometheus.remote_write "mimir" {
-	endpoint {
-		url = string.format(
-			"http://%s/api/v1/push",
-			coalesce(sys.env("REMOTE_WRITE_HOST"), "localhost:9009"),
-		)
-	}
+prometheus.remote_write "default" {
+  endpoint {
+    url = "http://mimir:9009/api/v1/write"
+  }
 }
 
-loki.write "loki" {
-	endpoint {
-		url = string.format(
-			"http://%s/loki/api/v1/push",
-			coalesce(sys.env("LOKI_HOST"), "localhost:3100"),
-		)
-	}
+otelcol.exporter.loki "default" {
+  forward_to = [loki.write.default.receiver]
 }
 
-otelcol.exporter.otlp "tempo" {
-	client {
-		endpoint = coalesce(sys.env("TEMPO_HOST"), "localhost:4317")
-
-		tls {
-			insecure = true
-		}
-	}
+loki.write "default" {
+  endpoint {
+    url = "http://loki:3100/loki/api/v1/push"
+  }
 }
 
-pyroscope.write "pyroscope" {
-	endpoint {
-		url = string.format(
-			"http://%s",
-			coalesce(sys.env("PYROSCOPE_HOST"), "localhost:4040"),
-		)
-	}
-}

@@ -97,19 +97,34 @@ management:
   tracing:
     sampling:
       probability: 1.0
-  otlp:
-    logging:
-#      endpoint: "http://localhost:4318"
-      endpoint: https://localhost:12345/v1/logs
-    metrics:
-      export:
-        url: http://localhost:12345/v1/metrics
-    tracing:
-      endpoint: "http://localhost:12345"
 otel:
   exporter:
     otlp:
-      endpoint: "http://localhost:12345"
+#      endpoint: http://host.docker.internal:4318
+      #      endpoint: http://localhost:4317
+#      endpoint: http://localhost:4318
+      traces:
+        endpoint: "http://localhost:4318/v1/traces"
+      logs:
+        endpoint: "http://localhost:4318/v1/logs"
+      metrics:
+        endpoint: "http://localhost:4318/v1/metrics"
+  logs.exporter: otlp
+  metrics.exporter: otlp
+  traces.exporter: otlp
+  propagators:
+    - tracecontext
+    - b3
+  resource:
+    attributes:
+      deployment.environment: dev
+      service:
+        name: "${spring.application.name}"
+        namespace: mlhub
+
+  #Configure metrics generation
+  metric.export.interval: 5000 #Export metrics each five seconds
+  instrumentation.micrometer.enabled: true #Enabe Micrometer metrics bridge
 
 server:
   port: 8090
