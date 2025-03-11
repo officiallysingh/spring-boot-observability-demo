@@ -100,15 +100,15 @@ management:
 otel:
   exporter:
     otlp:
-#      endpoint: http://host.docker.internal:4318
+      endpoint: http://alloy:4318
       #      endpoint: http://localhost:4317
 #      endpoint: http://localhost:4318
-      traces:
-        endpoint: "http://localhost:4318/v1/traces"
-      logs:
-        endpoint: "http://localhost:4318/v1/logs"
-      metrics:
-        endpoint: "http://localhost:4318/v1/metrics"
+#      traces:
+#        endpoint: "http://alloy:4318/v1/traces"
+#      logs:
+#        endpoint: "http://alloy:4318/v1/logs"
+#      metrics:
+#        endpoint: "http://alloy:4318/v1/metrics"
   logs.exporter: otlp
   metrics.exporter: otlp
   traces.exporter: otlp

@@ -4,9 +4,6 @@ logging {
 }
 
 otelcol.receiver.otlp "default" {
-  grpc {
-    endpoint = "0.0.0.0:4317"
-  }
   http {
     endpoint = "0.0.0.0:4318"
   }
@@ -20,13 +17,13 @@ otelcol.receiver.otlp "default" {
 
 otelcol.processor.batch "default" {
   output {
-    metrics  = [otelcol.exporter.otlphttp.tempo.input]
-    traces   = [otelcol.exporter.otlphttp.tempo.input]
-    logs     = [otelcol.exporter.otlphttp.tempo.input]
+    metrics  = [otelcol.exporter.otlphttp.default.input]
+    traces   = [otelcol.exporter.otlphttp.default.input]
+    logs     = [otelcol.exporter.otlphttp.default.input]
   }
 }
 
-otelcol.exporter.otlphttp "tempo" {
+otelcol.exporter.otlphttp "default" {
     client {
         endpoint = "http://tempo:3200"
         tls {
