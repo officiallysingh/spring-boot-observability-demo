@@ -1,6 +1,7 @@
+name: observability
+
 services:
     grafana:
-        container_name: grafana
         image: grafana/grafana:11.5.1
         extra_hosts: ['host.docker.internal:host-gateway']
         restart: on-failure
@@ -19,13 +20,14 @@ services:
             start_interval: 0s
             timeout: 10s
             retries: 5
+        networks:
+            - observability
 #        env_file:
 #            # Use this optional env file to add any secrets required by data sources you can add to config/grafana/datasources
 #            - path: ~/.grafana_dev_datasources
 #              required: false
 
     mimir:
-        container_name: mimir
         image: grafana/mimir:2.14.3
         extra_hosts: ['host.docker.internal:host-gateway']
         restart: on-failure
@@ -35,22 +37,22 @@ services:
             - ./observability/config/mimir:/etc/mimir-config
         ports:
             - "9009:9009"
+        networks:
+            - observability
 
     loki:
-        container_name: loki
         image: grafana/loki:3.4.1
         extra_hosts: ['host.docker.internal:host-gateway']
         restart: on-failure
         ports:
             - "3100:3100"
+        networks:
+            - observability
 
     tempo:
-        container_name: tempo
         image: grafana/tempo:2.7.0
         extra_hosts: ['host.docker.internal:host-gateway']
         restart: on-failure
-#        volumes:
-#            - ./observability/config/tempo.yml:/etc/tempo.yml:ro
         command:
             - "-storage.trace.backend=local"                  # tell tempo where to permanently put traces
             - "-storage.trace.local.path=/tmp/tempo/traces"
@@ -59,15 +61,20 @@ services:
             - "-server.http-listen-port=3200"
         ports:
             - "3200:3200"
-            - "4317:4317"
+            - "3300:4317"
+#            - "4320:4317"  # otlp grpc
+#            - "4321:4318"  # otlp http
+        networks:
+            - observability
 
     pyroscope:
-        container_name: pyroscope
         image: grafana/pyroscope:1.5.0
         extra_hosts: ['host.docker.internal:host-gateway']
         restart: on-failure
         ports:
             - "4040:4040"
+        networks:
+            - observability
 #    beyla:
 #        image: grafana/beyla:latest
 #        pid: "service:goblog"
@@ -76,7 +83,6 @@ services:
 #            BEYLA_TRACE_PRINTER: text
 #            BEYLA_OPEN_PORT: 8443
     alloy:
-        container_name: alloy
         image: grafana/alloy:v1.5.1
         extra_hosts: ['host.docker.internal:host-gateway']
         pull_policy: always
@@ -87,7 +93,7 @@ services:
         environment:
             REMOTE_WRITE_HOST: mimir:9009
             LOKI_HOST: loki:3100
-            TEMPO_HOST: tempo:4317
+            TEMPO_HOST: tempo:3300
             PYROSCOPE_HOST: pyroscope:4040
         depends_on:
 #            - beyla
@@ -103,11 +109,24 @@ services:
             - --stability.level=experimental # Enable all functionality
         ports:
             - "12345:12345"
-            - 4318:4318
-#            - 4317:4317
+            - "4318:4318"
+            - "4317:4317"
+        networks:
+            - observability
+
+    # Add your Spring Boot application service
+#    spring-boot-observability-demo:
+#        image: spring-boot-observability-demo:0.0.1
+#        extra_hosts: ['host.docker.internal:host-gateway']
+#        restart: on-failure
+#        ports:
+#            - "8090:8090"
+#        environment:
+#            - OTEL_EXPORTER_OTLP_ENDPOINT=http://host.docker.internal:4318
+#        networks:
+#            - observability
 networks:
-    default:
-        name: ksoot
+    observability:
         driver: bridge
 
 #volumes:

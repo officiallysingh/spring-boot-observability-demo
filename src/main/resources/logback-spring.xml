@@ -2,26 +2,21 @@
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
             <pattern>
-                %d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - traceId=%X{traceId:-N/A} spanId=%X{spanId:-N/A} serviceName=spring-boot-observability-demo - %msg%n
+                %d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - traceId=%X{trace_id:-N/A} spanId=%X{span_id:-N/A} serviceName=spring-boot-observability-demo - %msg%n
             </pattern>
         </encoder>
     </appender>
 
-    <appender name="OTLP" class="io.opentelemetry.instrumentation.logback.appender.v1_0.OpenTelemetryAppender">
-        <serviceName>spring-boot-observability-demo</serviceName>
-        <resourceAttributes>
-            <attribute key="service.name" value="spring-boot-observability-demo"/>
-            <attribute key="service.instance.id" value="${HOSTNAME}"/>
-        </resourceAttributes>
-<!--        <exporter>-->
-<!--            <otlp>-->
-<!--                <endpoint>http://host.docker.internal:4318</endpoint>-->
-<!--            </otlp>-->
-<!--        </exporter>-->
-    </appender>
+<!--    <appender name="OTLP" class="io.opentelemetry.instrumentation.logback.appender.v1_0.OpenTelemetryAppender">-->
+<!--        <serviceName>spring-boot-observability-demo</serviceName>-->
+<!--        <resourceAttributes>-->
+<!--            <attribute key="service.name" value="spring-boot-observability-demo"/>-->
+<!--            <attribute key="service.instance.id" value="${HOSTNAME}"/>-->
+<!--        </resourceAttributes>-->
+<!--    </appender>-->
 
     <root level="INFO">
         <appender-ref ref="CONSOLE"/>
-        <appender-ref ref="OTLP"/>
+<!--        <appender-ref ref="OTLP"/>-->
     </root>
 </configuration>
