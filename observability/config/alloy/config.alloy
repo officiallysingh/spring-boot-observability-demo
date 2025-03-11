@@ -4,8 +4,11 @@ logging {
 }
 
 otelcol.receiver.otlp "default" {
+  grpc {
+    endpoint = "0.0.0.0:4317"
+  }
   http {
-    endpoint="0.0.0.0:4318"
+    endpoint = "0.0.0.0:4318"
   }
 
   output {
@@ -25,7 +28,7 @@ otelcol.processor.batch "default" {
 
 otelcol.exporter.otlphttp "tempo" {
     client {
-        endpoint = coalesce(sys.env("TEMPO_HOST"), "localhost:3300")
+        endpoint = "http://host.docker.internal:4318"
         tls {
             insecure             = true
             insecure_skip_verify = true
@@ -39,10 +42,7 @@ otelcol.exporter.prometheus "default" {
 
 prometheus.remote_write "mimir" {
 	endpoint {
-		url = string.format(
-			"http://%s/api/v1/push",
-			coalesce(sys.env("REMOTE_WRITE_HOST"), "localhost:9009"),
-		)
+		url = "http://host.docker.internal:9009/api/v1/push"
 	}
 }
 
@@ -52,10 +52,7 @@ otelcol.exporter.loki "default" {
 
 loki.write "local" {
 	endpoint {
-		url = string.format(
-			"http://%s/loki/api/v1/push",
-			coalesce(sys.env("LOKI_HOST"), "localhost:3100"),
-		)
+		url = "http://host.docker.internal:3100/loki/api/v1/push"
 	}
 }
 
@@ -63,16 +60,13 @@ loki.write "local" {
 // Pyroscope.
 pyroscope.scrape "default" {
   targets = [
-    {"__address__" = "localhost:12345", "service_name" = "alloy"},
+    {"__address__" = "host.docker.internal:12345", "service_name" = "alloy"},
   ]
   forward_to = [pyroscope.write.pyroscope.receiver]
 }
 
 pyroscope.write "pyroscope" {
 	endpoint {
-		url = string.format(
-			"http://%s",
-			coalesce(sys.env("PYROSCOPE_HOST"), "localhost:4040"),
-		)
+		url = "http://host.docker.internal:4040"
 	}
 }

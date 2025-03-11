@@ -60,10 +60,13 @@ services:
             - "-auth.enabled=false"                           # disables the requirement for the X-Scope-OrgID header
             - "-server.http-listen-port=3200"
         ports:
-            - "3200:3200"
-            - "3300:4317"
-#            - "4320:4317"  # otlp grpc
-#            - "4321:4318"  # otlp http
+            - "3200:3200"   # tempo
+#            - "9095:9095" # tempo grpc
+#            - "4317:4317"  # otlp grpc
+#            - "4318:4318"  # otlp http
+#        ports:
+#            - "3200:3200"
+#            - "4317:4317"
         networks:
             - observability
 
@@ -90,11 +93,11 @@ services:
         restart: on-failure
         volumes:
             - ./observability/config/alloy:/etc/alloy
-        environment:
-            REMOTE_WRITE_HOST: mimir:9009
-            LOKI_HOST: loki:3100
-            TEMPO_HOST: tempo:3300
-            PYROSCOPE_HOST: pyroscope:4040
+#        environment:
+#            REMOTE_WRITE_HOST: mimir:9009
+#            LOKI_HOST: loki:3100
+#            TEMPO_HOST: tempo:4321
+#            PYROSCOPE_HOST: pyroscope:4040
         depends_on:
 #            - beyla
             - mimir
@@ -109,8 +112,8 @@ services:
             - --stability.level=experimental # Enable all functionality
         ports:
             - "12345:12345"
-            - "4318:4318"
             - "4317:4317"
+            - "4318:4318"
         networks:
             - observability
 
@@ -121,8 +124,8 @@ services:
 #        restart: on-failure
 #        ports:
 #            - "8090:8090"
-#        environment:
-#            - OTEL_EXPORTER_OTLP_ENDPOINT=http://host.docker.internal:4318
+##        environment:
+##            - OTEL_EXPORTER_OTLP_ENDPOINT=http://host.docker.internal:4318
 #        networks:
 #            - observability
 networks:

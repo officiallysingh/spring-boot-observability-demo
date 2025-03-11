@@ -74,14 +74,9 @@ management:
       enabled: true
     process:
       enabled: true
-  observations:
-    key-values:
-      #      application: ${spring.application.name}
-      org: "${spring.application.org}"
   metrics:
     tags:
       application: "${spring.application.name}"
-      org: "${spring.application.org}"
       profiles: "${spring.profiles.active}"
     distribution:
       percentiles-histogram:
@@ -90,48 +85,44 @@ management:
             requests: true
           client:
             requests: true
-  prometheus:
-    metrics:
-      export:
-        step: 3s
   tracing:
     sampling:
       probability: 1.0
 otel:
-  instrumentation:
-    logback-mdc:
-      enabled: true
   exporter:
     otlp:
       endpoint: http://localhost:4318
-      #      endpoint: http://localhost:4317
-#      endpoint: http://localhost:4318
-#      traces:
-#        endpoint: "http://alloy:4318/v1/traces"
-#      logs:
-#        endpoint: "http://alloy:4318/v1/logs"
-#      metrics:
-#        endpoint: "http://alloy:4318/v1/metrics"
   logs.exporter: otlp
   metrics.exporter: otlp
   traces.exporter: otlp
-  propagators:
-    - tracecontext
-    - b3
+#  logs.exporter: console
+#  metrics.exporter: console
+#  traces.exporter: console
+#  instrumentation.runtime-telemetry.enabled: false
+#  instrumentation.[name].enabled
   resource:
     attributes:
-      deployment.environment: dev
+#      process.command_args: ""
+#      process.executable.path: ""
+#      deployment.environment: dev
       service:
         name: "${spring.application.name}"
-        instance.id: ${HOSTNAME}
-        namespace: mlhub
-      application: "${spring.application.name}"
-      org: "${spring.application.org}"
-      profiles: "${spring.profiles.active}"
-
+        instance.id: instance-1
+  java:
+    disabled:
+      resource:
+        providers:
+          - io.opentelemetry.instrumentation.resources.ProcessResourceProvider
+          - io.opentelemetry.instrumentation.resources.ProcessRuntimeResourceProvider
+#          - io.opentelemetry.instrumentation.spring.autoconfigure.internal.resources.DistroVersionResourceProvider
+          - io.opentelemetry.instrumentation.resources.ManifestResourceProvider
+          - io.opentelemetry.instrumentation.resources.OsResourceProvider
+          - io.opentelemetry.instrumentation.resources.HostResourceProvider
+          - io.opentelemetry.sdk.autoconfigure.EnvironmentResourceProvider
+          - io.opentelemetry.instrumentation.resources.ContainerResourceProvider
   #Configure metrics generation
-  metric.export.interval: 5000 #Export metrics each five seconds
-  instrumentation.micrometer.enabled: true #Enabe Micrometer metrics bridge
+  metric.export.interval: 10s #Export metrics each 10 seconds
+#  instrumentation.micrometer.enabled: true #Enabe Micrometer metrics bridge
 
 server:
   port: 8090

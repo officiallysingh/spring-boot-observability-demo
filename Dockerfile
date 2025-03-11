@@ -17,6 +17,6 @@ COPY ${JAR_FILE} app.jar
 ADD --chmod=644 https://github.com/open-telemetry/opentelemetry-java-instrumentation/releases/download/v2.13.3/opentelemetry-javaagent.jar opentelemetry-javaagent.jar
 ENV JAVA_TOOL_OPTIONS=-javaagent:opentelemetry-javaagent.jar
 #ENV OTEL_EXPORTER_OTLP_ENDPOINT="http://alloy:4318"
-ENV OTEL_EXPORTER_OTLP_ENDPOINT="http://host.docker.internal:4320"
+ENV OTEL_EXPORTER_OTLP_ENDPOINT="http://host.docker.internal:4318"
 
 ENTRYPOINT ["java","-jar","app.jar"]
