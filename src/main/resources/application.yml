@@ -98,12 +98,8 @@ otel:
 #  logs.exporter: console
 #  metrics.exporter: console
 #  traces.exporter: console
-#  instrumentation.runtime-telemetry.enabled: false
-#  instrumentation.[name].enabled
   resource:
     attributes:
-#      process.command_args: ""
-#      process.executable.path: ""
 #      deployment.environment: dev
       service:
         name: "${spring.application.name}"
@@ -114,12 +110,11 @@ otel:
         providers:
           - io.opentelemetry.instrumentation.resources.ProcessResourceProvider
           - io.opentelemetry.instrumentation.resources.ProcessRuntimeResourceProvider
-#          - io.opentelemetry.instrumentation.spring.autoconfigure.internal.resources.DistroVersionResourceProvider
           - io.opentelemetry.instrumentation.resources.ManifestResourceProvider
           - io.opentelemetry.instrumentation.resources.OsResourceProvider
-          - io.opentelemetry.instrumentation.resources.HostResourceProvider
-          - io.opentelemetry.sdk.autoconfigure.EnvironmentResourceProvider
-          - io.opentelemetry.instrumentation.resources.ContainerResourceProvider
+#          - io.opentelemetry.instrumentation.resources.HostResourceProvider
+#          - io.opentelemetry.sdk.autoconfigure.EnvironmentResourceProvider
+#          - io.opentelemetry.instrumentation.resources.ContainerResourceProvider
   #Configure metrics generation
   metric.export.interval: 10s #Export metrics each 10 seconds
 #  instrumentation.micrometer.enabled: true #Enabe Micrometer metrics bridge

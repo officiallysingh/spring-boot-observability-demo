@@ -1,37 +1,45 @@
-# Getting Started
+# Spring boot Open Telemetry Demo
 
-### Reference Documentation
-For further reference, please consider the following sections:
+This directory contains a Docker Compose environment that can be used to test
+Grafana Alloy.
 
-* [Official Apache Maven documentation](https://maven.apache.org/guides/index.html)
-* [Spring Boot Maven Plugin Reference Guide](https://docs.spring.io/spring-boot/3.4.3/maven-plugin)
-* [Create an OCI image](https://docs.spring.io/spring-boot/3.4.3/maven-plugin/build-image.html)
-* [OTLP for metrics](https://docs.spring.io/spring-boot/3.4.3/reference/actuator/metrics.html#actuator.metrics.export.otlp)
-* [Prometheus](https://docs.spring.io/spring-boot/3.4.3/reference/actuator/metrics.html#actuator.metrics.export.prometheus)
-* [Spring Web](https://docs.spring.io/spring-boot/3.4.3/reference/web/servlet.html)
+> **NOTE**: This environment is not intended for production use, and is
+> maintained on a best-effort basis.
 
-### Guides
-The following guides illustrate how to use some features concretely:
+By default, only Grafana and databases are exposed:
 
-* [Building a RESTful Web Service](https://spring.io/guides/gs/rest-service/)
-* [Serving Web Content with Spring MVC](https://spring.io/guides/gs/serving-web-content/)
-* [Building REST services with Spring](https://spring.io/guides/tutorials/rest/)
+* Grafana, for visualizing telemetry [http://localhost:3000](http://localhost:3000)
+* Grafana Mimir, for storing metrics [http://localhost:9009](http://localhost:9009)
+* Grafana Loki, for storing logs (`localhost:3100`)
+* Grafana Tempo, for storing traces (`localhost:3200`)
+* Grafana Pyroscope, for storing profiles (`localhost:4040`)
+* Grafana Alloy, for receiving and exporting OTEL metrics, traces and logs [http://localhost:12345](http://localhost:12345)
 
-### Maven Parent overrides
+Grafana is automatically provisioned with the appropriate datasources and
+dashboards for monitoring Grafana Alloy.
 
-Due to Maven's design, elements are inherited from the parent POM to the project POM.
-While most of the inheritance is fine, it also inherits unwanted elements like `<license>` and `<developers>` from the parent.
-To prevent this, the project POM contains empty overrides for these elements.
-If you manually switch to a different parent and actually want the inheritance, you need to remove those overrides.
-
-### Dev setup
 
 To create Docker image of application, run the following command.
 ```text
 docker image build . -t spring-boot-observability-demo:0.0.1 -f Dockerfile
 ```
 
-IntelliJ IDEA run configurations. Add following VM Argument to run with OpenTelemetry Java agent.
-```text
--javaagent:opentelemetry-javaagent.jar
+To start the environment, run:
+
+```bash
+docker compose up --build -d
 ```
+
+To stop the environment, run:
+
+```bash
+docker compose down
+```
+
+## Visualizing
+
+To visualize Alloy data in Grafana, open <http://localhost:3000> in a web browser.
+
+> **NOTE**: It can take up to a minute for Alloy metrics and profiles to start appearing.
+
+
