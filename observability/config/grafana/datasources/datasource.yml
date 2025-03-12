@@ -51,8 +51,8 @@ datasources:
         filterByTraceID: true
         filterBySpanID: true
       serviceMap: # If you are going to add serviceGraph feature to tempo, configure <<serviceMap.datasourceUid>>
-#        datasourceUid: 'Mimir'
-        datasourceUid: 'prometheus'
+        datasourceUid: 'Mimir'
+#        datasourceUid: 'prometheus'
       nodeGraph: # If you are going to add nodeGraph feature to tempo, enable <<nodeGraph>>
         enabled: true
     streamingEnabled:
