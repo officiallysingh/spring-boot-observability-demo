@@ -24,3 +24,14 @@ While most of the inheritance is fine, it also inherits unwanted elements like `
 To prevent this, the project POM contains empty overrides for these elements.
 If you manually switch to a different parent and actually want the inheritance, you need to remove those overrides.
 
+### Dev setup
+
+To create Docker image of application, run the following command.
+```text
+docker image build . -t spring-boot-observability-demo:0.0.1 -f Dockerfile
+```
+
+IntelliJ IDEA run configurations. Add following VM Argument to run with OpenTelemetry Java agent.
+```text
+-javaagent:opentelemetry-javaagent.jar
+```

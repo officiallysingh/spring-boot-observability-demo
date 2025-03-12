@@ -1,0 +1,19 @@
+{
+  "body": "Making an external API call",
+  "traceid": "e6b7265639b63a3555bb0a54d289bc5e",
+  "spanid": "b652103609293ce8",
+  "severity": "WARN",
+  "flags": 1,
+  "resources": {
+    "service.instance.id": "7d7bbb6f-3870-4b11-8642-44d55d5caf31",
+    "service.name": "spring-boot-observability-demo",
+    "telemetry.distro.name": "opentelemetry-spring-boot-starter",
+    "telemetry.distro.version": "2.13.3",
+    "telemetry.sdk.language": "java",
+    "telemetry.sdk.name": "opentelemetry",
+    "telemetry.sdk.version": "1.47.0"
+  },
+  "instrumentation_scope": {
+    "name": "spring.ObservabilityController"
+  }
+}
