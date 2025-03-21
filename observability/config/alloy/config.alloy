@@ -12,9 +12,24 @@ otelcol.receiver.otlp "default" {
   }
 
   output {
-    metrics = [otelcol.processor.batch.default.input]
+    metrics = [otelcol.processor.transform.default.input]
     traces  = [otelcol.processor.batch.default.input]
     logs    = [otelcol.processor.batch.default.input]
+  }
+}
+
+otelcol.processor.transform "default" {
+  metric_statements {
+    context = "resource"
+    statements = [
+      `delete_key(attributes, "process_command_args")`,
+      `delete_key(attributes, "process.command_args")`,
+      `delete_key(attributes, "process.command.args")`,
+    ]
+  }
+
+  output {
+    metrics = [otelcol.processor.batch.default.input]
   }
 }
 
